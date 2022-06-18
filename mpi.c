@@ -1,15 +1,10 @@
-// C program to implement the Quick Sort
-// Algorithm using MPI
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-// #include <unistd.h>
-// using namespace std;
 
-#define ARRAY_SIZE 5
+#define ARRAY_SIZE 10000000
 
-// Function to swap two numbers
 void swap(int *arr, int i, int j)
 {
     int t = arr[i];
@@ -17,79 +12,69 @@ void swap(int *arr, int i, int j)
     arr[j] = t;
 }
 
-// Function that performs the Quick Sort
-// for an array arr[] starting from the
-// index start and ending at index end
+//Função que executa o Quick Sort
+// para um array arr[] começando do
+// start e terminando em end
 void quicksort(int *arr, int start, int end)
 {
     int pivot, index;
 
-    // Base Case
+    // Caso base
     if (end <= 1)
         return;
 
-    // Pick pivot and swap with first
-    // element Pivot is middle element
+    // Escolhe o pivô e troca com o primeiro
+    // elemento Pivot é o elemento do meio
     pivot = arr[start + end / 2];
     swap(arr, start, start + end / 2);
 
-    // Partitioning Steps
+    // Etapa de particionamento
     index = start;
 
-    // Iterate over the range [start, end]
-    for (int i = start + 1; i < start + end; i++)
-    {
+    // Iterando no intervalo - início <-> fim
+    for (int i = start + 1; i < start + end; i++){
 
-        // Swap if the element is less
-        // than the pivot element
-        if (arr[i] < pivot)
-        {
+        // Troca se o elemento for menor
+        // do que o elemento pivô
+        if (arr[i] < pivot){
             index++;
             swap(arr, i, index);
         }
     }
 
-    // Swap the pivot into place
+    // Troca usando o pivô
     swap(arr, start, index);
 
-    // Recursive Call for sorting
-    // of quick sort function
+    // Chama recursivamente para os novos intervalos
     quicksort(arr, start, index - start);
     quicksort(arr, index + 1, start + end - index - 1);
 }
 
-// Function that merges the two arrays
-int *merge(int *arr1, int n1, int *arr2, int n2)
-{
-    int *result = (int *)malloc((n1 + n2) * sizeof(int));
+//Função que faz o merge de dois arrays
+int * merge(int *arr1, int arr1Size, int *arr2, int arr2Size){
+    int *result = (int *)malloc((arr1Size + arr2Size) * sizeof(int));
     int i = 0;
     int j = 0;
     int k;
 
-    for (k = 0; k < n1 + n2; k++)
-    {
-        if (i >= n1)
-        {
+    // Itera sobre os dois arrays (Soma do tamanho dos dois arrays)
+    //E faz a concatenação
+    for (k = 0; k < arr1Size + arr2Size; k++){
+        if (i >= arr1Size){
             result[k] = arr2[j];
             j++;
         }
-        else if (j >= n2)
-        {
+        else if (j >= arr2Size){
             result[k] = arr1[i];
             i++;
         }
 
-        // Indices in bounds as i < n1
-        // && j < n2
-        else if (arr1[i] < arr2[j])
-        {
+        else if (arr1[i] < arr2[j]){
             result[k] = arr1[i];
             i++;
         }
 
-        // v2[j] <= v1[i]
-        else
-        {
+        else{
             result[k] = arr2[j];
             j++;
         }
@@ -97,163 +82,100 @@ int *merge(int *arr1, int n1, int *arr2, int n2)
     return result;
 }
 
-// Driver Code
-int main(int argc, char *argv[])
-{
-    int number_of_elements;
+int main(int argc, char *argv[]){
     int *data = NULL;
-    int chunk_size, own_chunk_size;
+    int chunkSize, ownChunkSize;
     int *chunk;
     double time_taken;
     MPI_Status status;
 
-    int number_of_process, rank_of_process;
+    int numberOfProcess, rankOfProcess;
     MPI_Init(&argc, &argv);
-    MPI_Comm_size(MPI_COMM_WORLD, &number_of_process);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank_of_process);
+    MPI_Comm_size(MPI_COMM_WORLD, &numberOfProcess);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rankOfProcess);
 
-    if (rank_of_process == 0){
+    // Calculando o tamanho das divisões
+    // Se for impar, um processo não é utilizado
+    chunkSize = (ARRAY_SIZE % numberOfProcess == 0) ?
+                (ARRAY_SIZE / numberOfProcess) :
+                (ARRAY_SIZE / (numberOfProcess - 1));
 
-        // Reading number of Elements in file ...
-        // First Value in file is number of Elements
-        number_of_elements = ARRAY_SIZE;
-        printf("Number of Elements in the file is %d \n", number_of_elements);
-
-        // Computing chunk size
-        chunk_size = (number_of_elements %
-                    number_of_process == 0) ?
-                    (number_of_elements /
-                    number_of_process) :
-                    (number_of_elements /
-                    (number_of_process - 1));
+    // Apenas o mestre cria o Array
+    if (rankOfProcess == 0){
     
-        data = (int *)malloc(number_of_process *
-                            chunk_size *
-                            sizeof(int));
+        data = (int *)malloc(numberOfProcess * chunkSize * sizeof(int));
         
-        // Reading the rest elements in which
-        // operation is being performed
-        printf("Reading the array from the file.......\n");
-        for(int i = 0; i < number_of_elements; i++){
+        // Gerando array com números aleatórios de 0 a 100
+        for(int i = 0; i < ARRAY_SIZE; i++){
             data[i] = (rand() % 101);
         }
     
-        // Padding data with zero
-        for(int i = number_of_elements;
-                i < number_of_process *
-                    chunk_size; i++){
-                data[i] = 0;
-        }
-    
-        // Printing the array read from file
-        printf("Elements in the array is : \n");
-        for(int i = 0; i < number_of_elements; i++){
-                printf("%d  ", data[i]);
-        }
-    
-        printf("\n");
+        // printf("Elementos no array: ");
+        // for(int i = 0; i < ARRAY_SIZE; i++){
+        //         printf("%d  ", data[i]);
+        // }
+        // printf("\n");
     }
 
-    // Blocks all process until reach this point
+    // Cria uma barreira para sincronizar os processos. (Espera todos chegarem nesse ponto).
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // Starts Timer
+    // Inicia o timer
     time_taken -= MPI_Wtime();
 
-    // BroadCast the Size to all the
-    // process from root process
-    MPI_Bcast(&number_of_elements, 1, MPI_INT, 0,
-              MPI_COMM_WORLD);
-
-    // Computing chunk size
-  chunk_size= (number_of_elements %
-               number_of_process == 0) ?
-              (number_of_elements /
-               number_of_process) :
-              (number_of_elements /
-              (number_of_process - 1));
+    // Envia o tamanho para todos os processos
+    int arrSize = ARRAY_SIZE;
+    MPI_Bcast(&arrSize, 1, MPI_INT, 0, MPI_COMM_WORLD);
  
-  // Calculating total size of chunk
-  // according to bits
-  chunk = (int *)malloc(chunk_size *
-                        sizeof(int));
+    // Alocando o tamanho de uma subdivisão do array
+    chunk = (int *)malloc(chunkSize * sizeof(int));
  
-  // Scatter the chuck size data to all process
-  MPI_Scatter(data, chunk_size, MPI_INT, chunk,
-              chunk_size, MPI_INT, 0, MPI_COMM_WORLD);
-  free(data);
-  data = NULL;
+    // Envia a subdivisão do array para todos os processos (Subdivisões de tamanho chunkSize)
+    MPI_Scatter(data, chunkSize, MPI_INT, chunk, chunkSize, MPI_INT, 0, MPI_COMM_WORLD);
+    free(data);
+    data = NULL;
  
-  // Compute size of own chunk and
-               // then sort them
-  // using quick sort
+    // Calcula o tamanho da própria subdivisão
+    ownChunkSize = (ARRAY_SIZE >= chunkSize * (rankOfProcess + 1)) ? chunkSize : (ARRAY_SIZE - chunkSize * rankOfProcess);
  
-  own_chunk_size = (number_of_elements >=
-                    chunk_size*(rank_of_process + 1)) ?
-                    chunk_size : (number_of_elements -
-                                  chunk_size*rank_of_process);
+    // Ordena o array para cada subdivisão recebida com o quicksort
+    quicksort(chunk, 0, ownChunkSize);
  
-  // Sorting array with quick sort for every
-  // chunk as called by process
-  quicksort(chunk, 0, own_chunk_size);
- 
-  for(int step = 1; step < number_of_process; step = 2 * step)
-  {
-        if (rank_of_process % (2 * step) != 0)
-        {
-            MPI_Send(chunk, own_chunk_size, MPI_INT,
-                     rank_of_process - step, 0,
-                     MPI_COMM_WORLD);
+    // Itera a cada 2 * processoAtual (step) para juntar os dados novamente.
+    for(int step = 1; step < numberOfProcess; step = 2 * step){
+        if (rankOfProcess % (2 * step) != 0){
+            MPI_Send(chunk, ownChunkSize, MPI_INT, rankOfProcess - step, 0, MPI_COMM_WORLD);
             break;
         }
 
-        if (rank_of_process + step < number_of_process)
-        {
-            int received_chunk_size = (number_of_elements >= chunk_size * (rank_of_process + 2 * step))
-                                          ? (chunk_size * step)
-                                          : (number_of_elements - chunk_size * (rank_of_process + step));
-            int *chunk_received;
-            chunk_received = (int *)malloc(
-                received_chunk_size * sizeof(int));
-            MPI_Recv(chunk_received, received_chunk_size,
-                     MPI_INT, rank_of_process + step, 0,
-                     MPI_COMM_WORLD, &status);
+        if (rankOfProcess + step < numberOfProcess){
+            int receivedChunkSize = (ARRAY_SIZE >= chunkSize * (rankOfProcess + 2 * step)) ? (chunkSize * step) : (ARRAY_SIZE - chunkSize * (rankOfProcess + step));
+            int *chunkReceived;
+            chunkReceived = (int *)malloc(receivedChunkSize * sizeof(int));
+            MPI_Recv(chunkReceived, receivedChunkSize, MPI_INT, rankOfProcess + step, 0, MPI_COMM_WORLD, &status);
 
-            data = merge(chunk, own_chunk_size,
-                         chunk_received,
-                         received_chunk_size);
+            data = merge(chunk, ownChunkSize, chunkReceived, receivedChunkSize);
 
             free(chunk);
-            free(chunk_received);
+            free(chunkReceived);
             chunk = data;
-            own_chunk_size = own_chunk_size + received_chunk_size;
+            ownChunkSize = ownChunkSize + receivedChunkSize;
         }
   }
  
-  // Stop the timer
-  time_taken += MPI_Wtime();
+    // Para o cronômetro
+    time_taken += MPI_Wtime();
  
-  // Opening the other file as taken form input
-  // and writing it to the file and giving it
-  // as the output
-  if(rank_of_process == 0)
-  {
-        // For Printing in the terminal
-        printf("Total number of Elements given as input : "
-               "%d\n",
-               number_of_elements);
-        printf("Sorted array is: \n");
+    // O processo mestre exibe o resultado
+    if(rankOfProcess == 0){
+        printf("Array Ordenado \n");
 
-        for (int i = 0; i < number_of_elements; i++)
-        {
-            printf("%d  ", chunk[i]);
-        }
+        // for (int i = 0; i < ARRAY_SIZE; i++){
+        //     printf("%d  ", chunk[i]);
+        // }
 
-        printf(
-            "\n\nQuicksort %d ints on %d procs: %f secs\n",
-            number_of_elements, number_of_process,
-            time_taken);
-  }
+        printf("\n\nQuicksort ordenou %d inteiros em %d processos no tempo: %f segundos\n", ARRAY_SIZE, numberOfProcess, time_taken);
+    }
  
   MPI_Finalize();
   return 0;

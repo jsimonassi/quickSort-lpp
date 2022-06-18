@@ -76,11 +76,11 @@ int main()
     int *arr = malloc(N * sizeof(int));
 
     // Preenchendo o array
-    printf("Vetor desordenado: \n");
+    // printf("Vetor desordenado: \n");
     for (int i = 0; i < N; i++)
     {
         arr[i] = rand() % 100;
-        printf("%d ", arr[i]);
+        // printf("%d ", arr[i]);
     }
     printf("\n");
     clock_t tic = clock();
@@ -89,13 +89,14 @@ int main()
     quicksort(arr, 0, N - 1);
 
     clock_t toc = clock();
-    printf("Elapsed: %f seconds\n", (double)(toc - tic) / CLOCKS_PER_SEC);
+    printf("\n\nQuicksort ordenou %d inteiros usando openMp com 8 threads (Via Export) em: %f segundos\n", N, (double)(toc - tic) / CLOCKS_PER_SEC);
+    
     // Printa o array ordenado
-    printf("Vetor ordenado: \n");
-    for (int i = 0; i < N; i++)
-    {
-        printf("%d ", arr[i]);
-    }
+    // printf("Vetor ordenado: \n");
+    // for (int i = 0; i < N; i++)
+    // {
+    //     printf("%d ", arr[i]);
+    // }
 
     return 0;
 }

@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "utils.c"
 
-#define ARRAY_SIZE 1000000
+#define ARRAY_SIZE 5000000
 
 void swap(int *arr, int i, int j)
 {
@@ -62,5 +63,10 @@ int main(int argc, char *argv[]){
     quicksort(data, 0, ARRAY_SIZE - 1);
     clock_t toc = clock();
 
-    printf("\n\nQuicksort ordenou %d inteiros de forma sequencial em: %f segundos\n", ARRAY_SIZE, (double)(toc - tic) / CLOCKS_PER_SEC);
+    double result = (double)(toc - tic) / CLOCKS_PER_SEC;
+
+    printf("\n\nQuicksort ordenou %d inteiros de forma sequencial em: %f segundos\n", ARRAY_SIZE, result);
+
+    saveTime(result);
+    return 0;
 }

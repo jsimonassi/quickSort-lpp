@@ -2,8 +2,11 @@
 
 ### Alunos
 Gustavo Luppi
+
 João Victor Simonassi
+
 Leonardo Coreixas
+
 
 <hr/>
 

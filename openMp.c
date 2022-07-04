@@ -5,7 +5,7 @@
 #include <time.h>
 #include "utils.c"
 
-#define ARRAY_SIZE 5000000
+#define ARRAY_SIZE 100000000
 
 /**
  * Impleentação do algoritmo de Quicksort - openMP.
@@ -60,13 +60,13 @@ int main()
         // printf("%d ", arr[i]);
     }
     printf("\n");
-    clock_t tic = clock();
+    double startTime = omp_get_wtime();
 
     //chamada da função quicksort
     quickSort(arr, 0, ARRAY_SIZE - 1);
 
-    clock_t toc = clock();
-    double timeResult = (double)(toc - tic) / CLOCKS_PER_SEC;
+    double endTime = omp_get_wtime();
+    double timeResult = endTime - startTime;
     printf("\n\nQuicksort ordenou %d inteiros usando openMp com 8 threads (Via Export) em: %f segundos\n", ARRAY_SIZE, timeResult);
     
     //Printa o array ordenado

@@ -5,7 +5,7 @@
 #include "utils.c"
 
 
-#define ARRAY_SIZE 5000000
+#define ARRAY_SIZE 1000000
 
 void swap(int *arr, int i, int j){
     int t = arr[i];
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]){
     free(data);
     data = NULL;
  
-    // Calcula o tamanho da própria subdivisão
+    // Calcula a posição final com base no tamanho do chunk
     ownChunkSize = (ARRAY_SIZE >= chunkSize * (rankOfProcess + 1)) ? chunkSize : (ARRAY_SIZE - chunkSize * rankOfProcess);
  
     // Ordena o array para cada subdivisão recebida com o quicksort

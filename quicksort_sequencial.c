@@ -3,51 +3,47 @@
 #include <time.h>
 #include "utils.c"
 
-#define ARRAY_SIZE 5000000
+#define ARRAY_SIZE 1000000
 
-void swap(int *arr, int i, int j)
-{
-    int t = arr[i];
-    arr[i] = arr[j];
-    arr[j] = t;
+/**
+ * Método para fazer a troca de dados entre duas posições no vetor
+ */
+void swap (int * array,int i, const int j){
+    int k = array[i];
+    array[i] = array[j];
+    array[j] = k;
 }
 
-//Função que executa o Quick Sort
-// para um array arr[] começando do
-// start e terminando em end
-void quicksort(int *arr, int start, int end)
-{
-    int pivot, index;
 
-    // Caso base
-    if (end <= 1)
-        return;
+/**
+ * Método de particionamento que é o núcleo do algoritmo Quicksort.
+ * É a implementação utilizando o paradigma dividir para conquistar
+ */
+int partition (int * array, int start, const int end){
+    int i = start;
 
-    // Escolhe o pivô e troca com o primeiro
-    // elemento Pivot é o elemento do meio
-    pivot = arr[start + end / 2];
-    swap(arr, start, start + end / 2);
-
-    // Etapa de particionamento
-    index = start;
-
-    // Iterando no intervalo - início <-> fim
-    for (int i = start + 1; i < start + end; i++){
-
-        // Troca se o elemento for menor
-        // do que o elemento pivô
-        if (arr[i] < pivot){
-            index++;
-            swap(arr, i, index);
+    for (int j = start; j < end; j++) {
+        /* Elemento atual menor ou igual ao pivô? */
+        if (array[j] <= array[end]) {
+            swap(array,i++, j);
         }
     }
+    swap(array,i, end);
+    return i;
+}
 
-    // Troca usando o pivô
-    swap(arr, start, index);
+/**Função que executa o Quick Sort
+ * para um array[] começando do
+ * start e terminando em end
+ */
+void quicksort (int *array, int start, int end)
+{
+    if (start >= end) return;
 
-    // Chama recursivamente para os novos intervalos
-    quicksort(arr, start, index - start);
-    quicksort(arr, index + 1, start + end - index - 1);
+    int pivot = partition(array, start, end);
+
+    quicksort(array, start, pivot - 1);
+    quicksort(array, pivot + 1, end);
 }
 
 
@@ -68,5 +64,10 @@ int main(int argc, char *argv[]){
     printf("\n\nQuicksort ordenou %d inteiros de forma sequencial em: %f segundos\n", ARRAY_SIZE, result);
 
     saveTime(result);
+    if(sortTest(data, ARRAY_SIZE)){
+        printf("Array ordenado com sucesso\n");
+    }else{
+        printf("O array não foi ordenado corretamente\n");
+    } 
     return 0;
 }

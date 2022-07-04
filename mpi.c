@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "utils.c"
 
 
 #define ARRAY_SIZE 1000000
 
-void swap(int *arr, int i, int j)
-{
+void swap(int *arr, int i, int j){
     int t = arr[i];
     arr[i] = arr[j];
     arr[j] = t;
@@ -16,8 +16,7 @@ void swap(int *arr, int i, int j)
 //Função que executa o Quick Sort
 // para um array arr[] começando do
 // start e terminando em end
-void quicksort(int *arr, int start, int end)
-{
+void quicksort(int *arr, int start, int end){
     int pivot, index;
 
     // Caso base
@@ -176,6 +175,13 @@ int main(int argc, char *argv[]){
         // }
 
         printf("\n\nQuicksort ordenou %d inteiros em %d processos no tempo: %f segundos\n", ARRAY_SIZE, numberOfProcess, time_taken);
+        saveTime(time_taken);
+        
+        if(sortTest(chunk, ARRAY_SIZE)){
+            printf("Array ordenado com sucesso\n");
+        }else{
+            printf("O array não foi ordenado corretamente\n");
+        } 
     }
  
   MPI_Finalize();

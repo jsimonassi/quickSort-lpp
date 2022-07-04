@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include "utils.c"
+
+#define ARRAY_SIZE 100000
 
 // Funcao que alterna entre a e b
 void swap(int *a, int *b)
@@ -66,19 +69,12 @@ void quicksort(int arr[], int start, int end)
 
 int main()
 {
-    // Declaração do tamnho do array
-    int N;
-    // Recebendo o valor de N
-    printf("Digite o tamanho do array: ");
-    scanf("%d", &N);
-
     // Declaration of array
-    int *arr = malloc(N * sizeof(int));
+    int *arr = malloc(ARRAY_SIZE * sizeof(int));
 
     // Preenchendo o array
     // printf("Vetor desordenado: \n");
-    for (int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < ARRAY_SIZE; i++){
         arr[i] = rand() % 100;
         // printf("%d ", arr[i]);
     }
@@ -86,17 +82,25 @@ int main()
     clock_t tic = clock();
 
     //chamada da função quicksort
-    quicksort(arr, 0, N - 1);
+    quicksort(arr, 0, ARRAY_SIZE - 1);
 
     clock_t toc = clock();
-    printf("\n\nQuicksort ordenou %d inteiros usando openMp com 8 threads (Via Export) em: %f segundos\n", N, (double)(toc - tic) / CLOCKS_PER_SEC);
+    double timeResult = (double)(toc - tic) / CLOCKS_PER_SEC;
+    printf("\n\nQuicksort ordenou %d inteiros usando openMp com 8 threads (Via Export) em: %f segundos\n", ARRAY_SIZE, timeResult);
     
-    // Printa o array ordenado
+    //Printa o array ordenado
     // printf("Vetor ordenado: \n");
-    // for (int i = 0; i < N; i++)
+    // for (int i = 0; i < ARRAY_SIZE; i++)
     // {
     //     printf("%d ", arr[i]);
     // }
 
+    if(sortTest(arr, ARRAY_SIZE)){
+        printf("Array ordenado com sucesso\n");
+    }else{
+        printf("O array não foi ordenado corretamente\n");
+    } 
+
+    saveTime(timeResult);
     return 0;
 }

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TRUE 1
+#define FALSE 0
+
 /**
  * @brief      Salva o resultado do tempo em um arquivo txt para consulta futura.
  * @param      execTime   Tempo da execução atual.
@@ -59,4 +62,18 @@ int cleanFile(){
     }
     fclose(file);
     return 0;
+}
+
+/**
+ * @brief Verifica a corretude das ordenações.
+ * @return retorna 1(true) se está tudo certo e 0(false) se a ordenação está incorreta.
+ */
+int sortTest(int *array, int arraySize){
+    int itsAllRight = TRUE;
+    for(int i = 0; i < arraySize-1; i++){
+        if(array[i] > array[i+1]){
+            itsAllRight = FALSE;
+        }
+    }
+    return itsAllRight;
 }

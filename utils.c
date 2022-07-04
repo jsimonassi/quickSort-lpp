@@ -70,7 +70,8 @@ int cleanFile(){
  */
 int sortTest(int *array, int arraySize){
     int itsAllRight = TRUE;
-    for(int i = 0; i < arraySize-1; i++){
+
+    for(int i = 0; i < arraySize-2; i++){
         if(array[i] > array[i+1]){
             itsAllRight = FALSE;
         }

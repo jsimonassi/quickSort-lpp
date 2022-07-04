@@ -5,7 +5,7 @@
 #include "utils.c"
 
 
-#define ARRAY_SIZE 1000000
+#define ARRAY_SIZE 5000000
 
 void swap(int *arr, int i, int j){
     int t = arr[i];

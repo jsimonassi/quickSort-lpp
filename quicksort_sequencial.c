@@ -3,47 +3,35 @@
 #include <time.h>
 #include "utils.c"
 
-#define ARRAY_SIZE 1000000
+#define ARRAY_SIZE 5000000
 
 /**
- * Método para fazer a troca de dados entre duas posições no vetor
+ * Impleentação sequencial do algoritmo de Quicksort.
  */
-void swap (int * array,int i, const int j){
-    int k = array[i];
-    array[i] = array[j];
-    array[j] = k;
-}
-
-
-/**
- * Método de particionamento que é o núcleo do algoritmo Quicksort.
- * É a implementação utilizando o paradigma dividir para conquistar
- */
-int partition (int * array, int start, const int end){
-    int i = start;
-
-    for (int j = start; j < end; j++) {
-        /* Elemento atual menor ou igual ao pivô? */
-        if (array[j] <= array[end]) {
-            swap(array,i++, j);
-        }
-    }
-    swap(array,i, end);
-    return i;
-}
-
-/**Função que executa o Quick Sort
- * para um array[] começando do
- * start e terminando em end
- */
-void quicksort (int *array, int start, int end)
-{
-    if (start >= end) return;
-
-    int pivot = partition(array, start, end);
-
-    quicksort(array, start, pivot - 1);
-    quicksort(array, pivot + 1, end);
+void quickSort(int *array, int start, int end) {
+	int i, j, pivo, aux;
+	i = start;
+	j = end-1;
+	pivo = array[(start + end) / 2];
+	while(i <= j) {
+		while(array[i] < pivo && i < end) {
+			i++;
+		}
+		while(array[j] > pivo && j > start) {
+			j--;
+		}
+		if(i <= j) {
+			aux = array[i];
+			array[i] = array[j];
+			array[j] = aux;
+			i++;
+			j--;
+		}
+	}
+	if(j > start)
+		quickSort(array, start, j+1);
+	if(i < end)
+		quickSort(array, i, end);
 }
 
 
@@ -56,7 +44,7 @@ int main(int argc, char *argv[]){
     }
 
     clock_t tic = clock();
-    quicksort(data, 0, ARRAY_SIZE - 1);
+    quickSort(data, 0, ARRAY_SIZE - 1);
     clock_t toc = clock();
 
     double result = (double)(toc - tic) / CLOCKS_PER_SEC;
